@@ -1,0 +1,216 @@
+ACID (atomicity, consistency, isolation, durability) is a set of properties of database transactions intended to guarantee data validity despite errors, power failures, and other mishaps. 
+-Atomicity guarantees that each transaction is treated as a single "unit", which either succeeds completely or fails completely: if any of the statements constituting a transaction fails to complete, the entire transaction fails and the database is left unchanged. 
+-Consistency ensures that a transaction can only bring the database from one valid state to another, maintaining database invariants: any data written to the database must be valid according to all defined rules, including constraints, cascades, triggers, and any combination thereof. This prevents database corruption by an illegal transaction, but does not guarantee that a transaction is correct. Referential integrity guarantees the primary key – foreign key relationship. 
+-Transactions are often executed concurrently (e.g., multiple transactions reading and writing to a table at the same time). Isolation ensures that concurrent execution of transactions leaves the database in the same state that would have been obtained if the transactions were executed sequentially. Isolation is the main goal of concurrency control; depending on the method used, the effects of an incomplete transaction might not even be visible to other transactions.
+-Durability guarantees that once a transaction has been committed, it will remain committed even in the case of a system failure (e.g., power outage or crash). This usually means that completed transactions (or their effects) are recorded in non-volatile memory.
+
+##4 Categories of Commands##
+-Data definition language (“DDL”) – Includes commands that are used to define the rows and columns in the relational database. Ex: CREATE, DROP, TRUNCATE, ALTER, BACKUP
+-Data manipulation language (“DML”) – Commands used to change or manipulate data in the relational database. Ex: USE, UPDATE, DELETE, SELECT
+-Data control language (“DCL”) – Includes commands that relate to user access or permissions in the relational database. Ex: GRANT, REVOKE 
+-Transaction control language (“TCL”) – Includes commands that relate to the transactions in the relational database. Ex: SAVEPOINT (will temporarily save a transaction. Note that this does not mean the transaction is finalized in the database. This command is useful because the user doesn’t have to go back to the last COMMIT point when rolling back a transaction, COMMIT(used to fully save a transaction in the database), ROLLBACK (used to restore the database back to the last time the “COMMIT” command was used,  just means we are restoring the database back to the last save point) 
+
+Note: all statements end in ; and all commands are written in capital letters, text in single quotes( ‘’)  
+##Creating a table:##
+CREATE TABLE table_name ( column_1 data_type, column_2 data type, column_3 data_type) ; 
+Example with constraints:
+ CREATE TABLE celebs (
+   id INTEGER PRIMARY KEY, (primary keys cannot be NULL, unique values, in every col) 
+   name TEXT UNIQUE, 
+   date_of_birth TEXT NOT NULL, 
+   date_of_death TEXT DEFAULT 'Not Applicable'
+   );
+   
+##Inserting values##
+INSERT INTO table_name( column_1, column_2, column_3) 
+VALUES( value1, value2, value3); 
+Can do 
+VALUES( value1, value2, value3), 
+VALUES( value3, value4, value5); 
+
+##Adding a column## 
+ALTER TABLE table_name 
+ADD COLUMN new_column DATA_TYPE (TEXT, INTEGER, etc);
+
+##Updating a row in the table##
+UPDATE table_name
+SET column_x = ‘whatyouwant’
+WHERE id=y; 
+
+##Deleting row/s from a table##
+DELETE FROM table_name 
+WHERE column_name is x; 
+
+##Selecting from a table##
+SELECT column_1, column_2, etc 
+FROM table_name; (* returns all columns)  
+#Select as#:
+SELECT column_1 AS ‘Title’
+FROM table_name (enables you to alias the column name, aka change it in the result w/o altering the column name itself) 
+
+#Select Distinct# 
+SELECT DISTINCT column_1 
+FROM table_name (returns distinct values) 
+
+#Select where# 
+SELECT *
+FROM table_name 
+WHERE column_2 (=,>,<,<=,>=, IS NULL, IS NOT NULL); 
+
+#Select where like# 
+SELECT * 
+FROM movies 
+WHERE name LIKE 'Se_en';  (inserting the _ will return both Seven and Se7en)
+
+#Using %# 
+SELECT * 
+FROM movies
+WHERE name LIKE '%man%'; (%man% returns everything with man in the title, %man would return every name where man is at the end, and man% would return everything with man at the front- also put a space) 
+
+#Select between#
+SELECT * 
+FROM movies 
+WHERE name BETWEEN 'D' AND 'G'; (returns movies beginning with ‘D’ up to movies beginning with ‘F’, only ‘G’ it could possibly return is a movie named ‘G’
+SELECT * 
+FROM movies 
+WHERE year BETWEEN 1970 AND 1979; (returns movies from 1970-1979)
+
+#Select and/or# 
+SELECT * 
+FROM movies 
+WHERE year > 2014
+  OR/AND genre='action'; 
+  
+#Selecting and ordering and setting limits# 
+SELECT *
+FROM movies
+WHERE imdb_rating > 8
+ORDER BY year DESC/ASC
+LIMIT 3;
+#Selecting and using cases#
+SELECT name,
+ CASE
+  WHEN imdb_rating > 8 THEN 'Fantastic'
+  WHEN imdb_rating > 6 THEN 'Poorly Received'
+  ELSE 'Avoid at All Costs'
+ END AS 'Review' (name of new column, would be the entire case if not renames) 
+FROM movies;
+SELECT name, number_grade, ROUND(fraction_completed*100) AS percent_completed FROM student_grades; 
+SELECT COUNT(*),
+CASE 
+WHEN number_grade>90 THEN "A" 
+WHEN number_grade>80 THEN "B" 
+WHEN number_grade>70 THEN "C" 
+WHEN number_grade< 70 THEN "F" 
+END AS letter_grade
+FROM student_grades
+GROUP BY letter_grade; 
+
+
+##Aggregate Functions##
+-COUNT(): count the number of rows
+-SUM(): the sum of the values in a column
+-MAX()/MIN(): the largest/smallest value
+-AVG(): the average of the values in a column
+-ROUND(): round the values in the column (ROUND(x, 2) to round to 2 decimal places) can also neat aggregate functions (ROUND(AVG(x, 2)) 
+SELECT COUNT(*)
+FROM fake_apps
+WHERE price=0; 
+##Group by statements##
+*come after WHERE, but before ORDER BY or LIMIT
+SELECT price, COUNT(*)
+FROM fake_apps
+WHERE downloads>10000
+GROUP BY price; 
+Can also group by column: 
+SELECT price,downloads, 
+FROM fake_apps
+WHERE downloads>10000
+GROUP BY 1,2; (groups by price and downloads) 
+
+
+##Having Statements##
+*comes after GROUP BY, but before ORDER BY and LIMIT.
+HAVING vs WHERE: WHERE is filtering individual rows, HAVING filters groups
+SELECT author, SUM(words) AS total_words FROM books
+    GROUP BY author
+    HAVING total_words > 1000000; 
+    
+##Joins##
+
+##Combining tables using inner join (JOIN)  (all rows must have a matching row in other table)##
+SELECT *
+FROM orders
+JOIN subscriptions
+	ON orders.subscription_id = subscriptions.subscription_id 
+WHERE subscriptions.description = 'Fashion Magazine';
+(Primary key for subscriptions matched to foreign key for orders) 
+(combined two tables on a column and filters rows on description being ‘Fashion Magazine’, assumes that all the rows match up) 
+  SELECT customers.customer_name, previous_query.subscriptions 
+FROM previous_query 
+JOIN customers 
+  ON previous_query.customer_id =customers.customer_id;
+SELECT a.fullname, b.fullname
+FROM friends
+JOIN persons a
+ON a.id = friends.person1_id
+JOIN persons b
+ON b.id = friends.person2_id; (given a table of people and then a table of id and friend ids, displays the pairs of friends) 
+Inserting into a table: 
+
+#Left Join  (left or first  table has all rows regardless of whether there is a matching row in other table)#
+SELECT * 
+FROM newspaper 
+LEFT JOIN online 
+  ON newspaper.id = online.id (can stop query here) 
+  WHERE online.id is NULL; (can see what entries are in first and not second) 
+SELECT customers.name,customers.email,SUM(orders.price) AS total FROM customers 
+LEFT JOIN orders
+ON customers.id=orders.customer_id
+GROUP BY customers.name
+ORDER BY orders.price DESC; (sums up price paid for each customer and orders) 
+
+#Self Join (Joins table to itself)#
+SELECT movies.title,sequels.title AS sequel_title
+    FROM movies
+    LEFT JOIN movies AS sequels 
+    ON movies.sequel_id = sequels.id; (given a movie title, and sequel id, create another table to join to the original one displaying the title of the sequel using the sequel id 
+
+#Cross Join (combines rows from both tables, not on condition)#
+SELECT * 
+  FROM newspaper 
+  CROSS JOIN months;
+  
+#Union (stacks one dataset on top of another, must have same # of cols, containing same data type and order)#
+SELECT * 
+FROM newspaper
+UNION 
+SELECT * 
+FROM online;
+
+##With (enables you to store result of a query into a temporary table using an alias)##
+WITH previous_query AS (
+  SELECT customer_id, 
+  COUNT(subscription_id) AS 
+  'subscriptions'
+  FROM orders
+  GROUP BY customer_id
+  )
+
+##Subqueries##
+SELECT title FROM songs WHERE artist IN (SELECT name FROM artists WHERE genre="Pop"); 
+Executes inner query first, finds all the names of pop artists in a table and then finds the titles using the result of that query in a different table.
+
+##Cursors##
+Enables you to process a result set one row at a time. Declare->Open->Fetch (If not Empty),-> Close(If empty)-> Deallocate
+DECLARE cursor_name CURSOR
+  FOR select_statement;
+OPEN cursor_name;
+FETCH NEXT FROM cursor INTO variable_list;
+WHILE @@FETCH_STATUS = 0  (fetch is successful) 
+    BEGIN
+        FETCH NEXT FROM cursor_name;  
+    END;
+CLOSE cursor_name;
+DEALLOCATE cursor_name;
+
