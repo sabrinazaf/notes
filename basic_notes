@@ -80,7 +80,10 @@ SELECT *
 FROM movies 
 WHERE year > 2014
   OR/AND genre='action'; 
-  
+
+#Using TOP # to order on Msql# 
+SELECT TOP 1 CITY,LEN(CITY) FROM STATION ORDER BY LEN(CITY) ASC, CITY ASC;
+
 #Selecting and ordering and setting limits# 
 SELECT *
 FROM movies
