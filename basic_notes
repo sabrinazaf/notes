@@ -205,6 +205,17 @@ WITH previous_query AS (
 SELECT title FROM songs WHERE artist IN (SELECT name FROM artists WHERE genre="Pop"); 
 Executes inner query first, finds all the names of pop artists in a table and then finds the titles using the result of that query in a different table.
 
+##Variables## (@ Sign is a necessity)
+#Initial Value Assignment#
+DECLARE @TestVariable AS VARCHAR(100)='Save Our Planet' (no assignment-> variable is NULL) 
+#Declaring Values Using SET# 
+DECLARE @TestVariable AS VARCHAR(100)
+SET @TestVariable = 'One Planet One Life' 
+PRINT @TestVariable
+#Declaring Values Using SELECT#
+DECLARE @TestVariable AS VARCHAR(100), @Variable2 AS UNIQUEIDENTIFIER
+SELECT @TestVariable = 'Save the Nature', @Variable2 = '6D8446DE' 
+PRINT @TestVariable
 ##Cursors##
 Enables you to process a result set one row at a time. Declare->Open->Fetch (If not Empty),-> Close(If empty)-> Deallocate
 DECLARE cursor_name CURSOR
@@ -217,4 +228,5 @@ WHILE @@FETCH_STATUS = 0  (fetch is successful)
     END;
 CLOSE cursor_name;
 DEALLOCATE cursor_name;
+
 
