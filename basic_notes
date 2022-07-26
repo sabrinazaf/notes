@@ -30,7 +30,7 @@ VALUES( value3, value4, value5);
 
 ##Adding a column## 
 ALTER TABLE table_name 
-ADD COLUMN new_column DATA_TYPE (TEXT, INTEGER, etc);
+ADD new_column DATA_TYPE (TEXT, INTEGER, etc);
 
 ##Updating a row in the table##
 UPDATE table_name
